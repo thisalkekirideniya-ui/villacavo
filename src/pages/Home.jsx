@@ -344,20 +344,7 @@ function RoomsShowcase() {
     </div>
   )
 
-  if (!isDesktop) {
-    return (
-      <section className="bg-cream py-24">
-        <div className="container-luxe">{header}</div>
-        <div className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-6 sm:px-8">
-          {rooms.map((r, i) => (
-            <div key={r.slug} className="snap-start">
-              <RoomCard room={r} i={i} />
-            </div>
-          ))}
-        </div>
-      </section>
-    )
-  }
+  if (!isDesktop) return <MobileRooms header={header} />
 
   return (
     <section ref={sectionRef} className="relative bg-cream" style={{ height: `calc(100vh + ${distance}px)` }}>
@@ -373,6 +360,99 @@ function RoomsShowcase() {
             <motion.div style={{ width: progress }} className="h-px bg-terra-500" />
           </div>
         </div>
+      </div>
+    </section>
+  )
+}
+
+/** Mobile / tablet: swipeable carousel that also slides on its own */
+function MobileRooms({ header }) {
+  const trackRef = useRef(null)
+  const [active, setActive] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const inView = useInView(trackRef, { amount: 0.4 })
+  const resumeTimer = useRef(null)
+
+  const slideTo = (k) => {
+    const track = trackRef.current
+    const card = track?.children[k]
+    if (!card) return
+    track.scrollTo({ left: card.offsetLeft - track.children[0].offsetLeft, behavior: 'smooth' })
+  }
+
+  // keep the indicator in sync with manual swipes
+  const onScroll = () => {
+    const track = trackRef.current
+    if (!track) return
+    const first = track.children[0]
+    const step = track.children[1] ? track.children[1].offsetLeft - first.offsetLeft : 1
+    setActive(Math.min(rooms.length - 1, Math.max(0, Math.round(track.scrollLeft / step))))
+  }
+
+  // auto-advance every 4s while visible and not being touched
+  useEffect(() => {
+    if (paused || !inView) return
+    const t = setInterval(() => {
+      setActive((a) => {
+        const next = (a + 1) % rooms.length
+        slideTo(next)
+        return next
+      })
+    }, 4000)
+    return () => clearInterval(t)
+  }, [paused, inView])
+
+  // pause while the guest is swiping, resume a few seconds later
+  const hold = () => {
+    clearTimeout(resumeTimer.current)
+    setPaused(true)
+  }
+  const release = () => {
+    clearTimeout(resumeTimer.current)
+    resumeTimer.current = setTimeout(() => setPaused(false), 5000)
+  }
+  useEffect(() => () => clearTimeout(resumeTimer.current), [])
+
+  return (
+    <section className="bg-cream py-24">
+      <div className="container-luxe">{header}</div>
+      <div
+        ref={trackRef}
+        onScroll={onScroll}
+        onTouchStart={hold}
+        onTouchEnd={release}
+        onPointerDown={hold}
+        onPointerUp={release}
+        className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-5 px-5 pb-6 [scrollbar-width:none] sm:scroll-px-8 sm:px-8 [&::-webkit-scrollbar]:hidden"
+      >
+        {rooms.map((r, i) => (
+          <div key={r.slug} className="snap-start">
+            <RoomCard room={r} i={i} />
+          </div>
+        ))}
+      </div>
+      <div className="container-luxe mt-4 flex items-center gap-3">
+        {rooms.map((r, k) => (
+          <button
+            key={r.slug}
+            onClick={() => { hold(); setActive(k); slideTo(k); release() }}
+            aria-label={`Show ${r.name}`}
+            className="flex h-6 flex-1 items-center"
+          >
+            <span className="relative block h-px w-full overflow-hidden bg-ink/15">
+              {k === active && (
+                <motion.span
+                  key={`${active}-${paused}`}
+                  className="absolute inset-y-0 left-0 bg-terra-500"
+                  initial={{ width: paused ? '100%' : '0%' }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: paused ? 0 : 4, ease: 'linear' }}
+                />
+              )}
+              {k < active && <span className="absolute inset-0 bg-terra-500/50" />}
+            </span>
+          </button>
+        ))}
       </div>
     </section>
   )
