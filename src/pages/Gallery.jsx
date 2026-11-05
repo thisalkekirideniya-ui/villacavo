@@ -49,7 +49,7 @@ export default function Gallery() {
             ))}
           </div>
 
-          <motion.div layout className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div layout className="mt-10 grid grid-cols-2 gap-2 sm:mt-14 sm:gap-4 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
               {list.map((g, i) => (
                 <motion.button
@@ -68,10 +68,10 @@ export default function Gallery() {
                     alt={g.alt}
                     className="aspect-square w-full object-cover transition-transform duration-[1.4s] group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-ink/60 via-transparent to-transparent p-5 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-ink/60 via-transparent to-transparent p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100 sm:p-5">
                     <div className="text-left text-white">
-                      <p className="font-caps text-[10px] tracking-[0.3em] text-terra-100">{g.cat}</p>
-                      <p className="font-display text-2xl">{g.alt}</p>
+                      <p className="font-caps text-[9px] tracking-[0.25em] text-terra-100 sm:text-[10px] sm:tracking-[0.3em]">{g.cat}</p>
+                      <p className="font-display text-base leading-tight sm:text-2xl">{g.alt}</p>
                     </div>
                   </div>
                 </motion.button>

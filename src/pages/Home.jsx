@@ -148,7 +148,7 @@ function Hero() {
                   transition={{ duration: 1.2, delay: 0.2, ease }}
                 />
                 <h1 className="mt-6 font-display uppercase leading-[1.02] tracking-[0.04em] text-white">
-                  <TypeLines lines={['A luxury villa', 'beneath the', 'misty peaks']} start={ready} className="text-[2rem] sm:text-6xl lg:text-[5.6rem]" />
+                  <TypeLines lines={['A luxury villa', 'beneath the', 'misty peaks']} start={ready} className="text-[1.75rem] min-[400px]:text-[2rem] sm:text-6xl lg:text-[5.6rem]" />
                 </h1>
                 <motion.p
                   className="mx-auto mt-7 max-w-xl text-[16px] leading-relaxed text-white/90 sm:text-lg"
@@ -242,14 +242,14 @@ function Welcome() {
       <section className="relative overflow-hidden bg-cream py-24 sm:py-32">
         <div className="container-luxe grid items-center gap-16 lg:grid-cols-12 lg:gap-20">
           {/* photo composition */}
-          <div className="relative pb-16 pr-10 sm:pb-20 sm:pr-16 lg:col-span-6">
+          <div className="relative pb-12 pr-8 sm:pb-20 sm:pr-16 lg:col-span-6">
             <CurtainImg src={images.villa2} alt="Villa Cavo terrace" className="aspect-square w-full" />
             <Reveal delay={0.3} className="absolute bottom-0 right-0 w-[45%] border-[6px] border-cream shadow-2xl sm:border-8">
               <Img src={images.tea} alt="Ceylon tea" className="aspect-square w-full object-cover" />
             </Reveal>
-            <Reveal delay={0.45} className="absolute -left-3 top-8 bg-terra-500 px-5 py-4 text-white shadow-xl sm:-left-6 sm:px-7 sm:py-5">
-              <p className="font-caps text-[10px] uppercase tracking-[0.3em] text-white/80">Uva Highlands</p>
-              <p className="mt-1 font-display text-2xl sm:text-3xl">Haputale</p>
+            <Reveal delay={0.45} className="absolute -left-3 top-6 bg-terra-500 px-4 py-3 text-white shadow-xl sm:-left-6 sm:top-8 sm:px-7 sm:py-5">
+              <p className="font-caps text-[9px] uppercase tracking-[0.25em] text-white/80 sm:text-[10px] sm:tracking-[0.3em]">Uva Highlands</p>
+              <p className="mt-1 font-display text-xl sm:text-3xl">Haputale</p>
             </Reveal>
           </div>
 
@@ -275,8 +275,8 @@ function Welcome() {
 
             <div className="mt-12 grid grid-cols-3 divide-x divide-ink/10 border-t border-ink/10 pt-8">
               {stats.map((s, i) => (
-                <Reveal key={s.label} delay={i * 0.1} className={i === 0 ? 'pr-4' : 'px-4 sm:px-6'}>
-                  <p className="font-display text-4xl text-terra-500 sm:text-5xl">
+                <Reveal key={s.label} delay={i * 0.1} className={i === 0 ? 'pr-3 sm:pr-6' : 'px-3 sm:px-6'}>
+                  <p className="font-display text-3xl text-terra-500 sm:text-5xl">
                     <Counter to={s.n} suffix={s.s} />
                   </p>
                   <p className="mt-2 font-caps text-[10px] uppercase tracking-[0.12em] text-ink-mute sm:tracking-[0.25em]">{s.label}</p>
@@ -625,14 +625,14 @@ function PhotoMarquee({ items, to, fade = 'from-white', className = '' }) {
     <div className={`relative overflow-hidden ${className}`}>
       <div className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r ${fade} to-transparent sm:w-32`} />
       <div className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l ${fade} to-transparent sm:w-32`} />
-      <div className="animate-marquee-right flex w-max gap-6 py-10 sm:gap-10">
+      <div className="animate-marquee-right flex w-max gap-4 py-6 sm:gap-10 sm:py-10">
         {[...items, ...items].map((p, i) => (
           <Link
             key={i}
             to={to}
             aria-hidden={i >= items.length}
             tabIndex={i >= items.length ? -1 : undefined}
-            className="arch group block h-72 w-56 shrink-0 overflow-hidden shadow-2xl sm:h-96 sm:w-72"
+            className="arch group block h-60 w-44 shrink-0 overflow-hidden shadow-xl sm:h-96 sm:w-72 sm:shadow-2xl"
           >
             <Img src={p.src} alt={p.label} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
           </Link>
