@@ -19,7 +19,8 @@ export default function Rooms() {
         eyebrow="Rooms & Suites"
         title={['Rest in', 'quiet luxury']}
         text="Each of our suites is a private world — warm timber, soft linens, a fireplace for misty evenings, and views that change with every hour."
-        image={images.suite}
+        image={images.living}
+        square
       />
 
       <section className="relative overflow-hidden bg-white py-20 sm:py-28">
@@ -73,7 +74,7 @@ function RoomRow({ room, i }) {
   return (
     <article className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
       <Reveal className={`lg:col-span-7 ${flip ? 'lg:order-2' : ''}`}>
-        <div className={`relative aspect-[4/3] overflow-hidden ${i % 2 === 0 ? 'arch' : ''}`}>
+        <div className="relative aspect-square overflow-hidden sm:aspect-[4/3]">
           <AnimatePresence mode="popLayout">
             <motion.div
               key={img}
@@ -86,9 +87,6 @@ function RoomRow({ room, i }) {
               <Img src={room.gallery[img]} alt={room.name} className="h-full w-full object-cover" />
             </motion.div>
           </AnimatePresence>
-          <span className="absolute bottom-5 left-5 bg-white/90 px-4 py-2 font-caps text-[11px] tracking-[0.3em] text-ink backdrop-blur">
-            {room.price} / night
-          </span>
         </div>
         <div className="mt-4 flex gap-3">
           {room.gallery.map((g, k) => (
@@ -96,7 +94,7 @@ function RoomRow({ room, i }) {
               key={k}
               onClick={() => setImg(k)}
               aria-label={`Show image ${k + 1}`}
-              className={`h-16 w-20 overflow-hidden transition-all duration-500 ${k === img ? 'opacity-100 ring-1 ring-terra-500 ring-offset-2' : 'opacity-50 hover:opacity-100'}`}
+              className={`h-16 w-16 overflow-hidden transition-all duration-500 ${k === img ? 'opacity-100 ring-1 ring-terra-500 ring-offset-2' : 'opacity-50 hover:opacity-100'}`}
             >
               <Img src={g} alt="" className="h-full w-full object-cover" />
             </button>
@@ -132,8 +130,8 @@ function RoomRow({ room, i }) {
             ))}
           </div>
           <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap sm:gap-4">
-            <Link to={`/book?room=${room.slug}`} className="btn-primary">Book this suite</Link>
-            <Link to="/contact" className="btn-outline">Ask a question</Link>
+            <Link to={`/book?room=${room.slug}`} className="btn-primary">Enquire about this suite</Link>
+            <a href={`https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(`Hello Villa Cavo, I would like to know more about the ${room.name}.`)}`} target="_blank" rel="noreferrer" className="btn-outline">WhatsApp us</a>
           </div>
         </Reveal>
       </div>

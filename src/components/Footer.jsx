@@ -51,7 +51,7 @@ export default function Footer() {
                 <Link to={l.to} className="link-underline text-sm text-white/80 hover:text-white">{l.label}</Link>
               </li>
             ))}
-            <li><Link to="/book" className="link-underline text-sm text-white/80 hover:text-white">Reservations</Link></li>
+            <li><Link to="/book" className="link-underline text-sm text-white/80 hover:text-white">Enquiries</Link></li>
           </ul>
         </div>
 

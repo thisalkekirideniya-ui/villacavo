@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { AnimatePresence, motion, useInView, useMotionValue, useScroll, useSpring, useTransform, animate } from 'framer-motion'
+import { Link } from 'react-router-dom'
+import { AnimatePresence, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, animate } from 'framer-motion'
 import { useSplashDone } from '../context'
 import {
   Reveal, MaskText, Img, ParallaxImg, CurtainImg, Eyebrow, SectionHeading, Ornament, CtaBand, ArrowLink, ease,
@@ -8,7 +8,7 @@ import {
 import Icon from '../components/Icon'
 import ArchMark from '../components/ArchMark'
 import { Birds, Fireflies, Magnetic, Mist, Tilt } from '../components/magic'
-import { images, rooms, experiences, services, testimonials, dayAtVilla, attractions, gallery } from '../data/site'
+import { images, rooms, experiences, services, testimonials, dayAtVilla, attractions, gallery, contact } from '../data/site'
 
 export default function Home() {
   return (
@@ -30,176 +30,186 @@ export default function Home() {
 }
 
 /* ------------------------------------------------------------------ HERO */
-function Hero() {
-  const ready = useSplashDone()
-  const ref = useRef(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const imgY = useTransform(scrollYProgress, [0, 1], [0, 160])
-  const textY = useTransform(scrollYProgress, [0, 1], [0, -80])
-  const state = ready ? 'show' : 'hidden'
-
-  const line = {
-    hidden: { y: '110%' },
-    show: (i) => ({ y: 0, transition: { duration: 1, delay: 0.05 + i * 0.1, ease } }),
-  }
-  const fade = {
-    hidden: { opacity: 0, y: 24 },
-    show: (d) => ({ opacity: 1, y: 0, transition: { duration: 0.7, delay: d, ease } }),
-  }
-
+/** Full-screen photo slideshow: slow cross-fade + gentle zoom, auto-advancing */
+function FullSlider({ slides, interval = 6000, active: run = true, className = '', overlay = 'bg-ink/45', children }) {
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    if (!run) return
+    const t = setInterval(() => setI((k) => (k + 1) % slides.length), interval)
+    return () => clearInterval(t)
+  }, [run, interval, slides.length, i])
   return (
-    <section ref={ref} className="relative overflow-hidden bg-white pt-28 lg:flex lg:min-h-screen lg:flex-col">
-      {/* soft terracotta glow, like the sun in the emblem */}
-      <div className="pointer-events-none absolute -right-40 top-10 h-[620px] w-[620px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(245,228,216,0.9) 0%, rgba(251,244,239,0.5) 40%, transparent 70%)' }} />
-      {ready && <Fireflies count={14} color="rgba(201,112,74,0.45)" />}
-
-      <div className="container-luxe relative grid items-center gap-12 lg:flex-1 lg:grid-cols-12 lg:gap-8">
-        <motion.div style={{ y: textY }} className="relative z-10 lg:col-span-6">
-          <motion.div variants={fade} custom={0} initial="hidden" animate={state}>
-            <Eyebrow>Haputale · Sri Lanka</Eyebrow>
-          </motion.div>
-
-          <h1 className="mt-8 font-display text-[3.4rem] leading-[0.92] text-ink sm:text-7xl xl:text-[6.5rem]">
-            {['Beneath', 'the misty', 'peaks.'].map((l, i) => (
-              <span key={l} className="block overflow-hidden pb-[0.06em]">
-                <motion.span
-                  className={`block ${i === 1 ? 'shimmer-text italic' : ''}`}
-                  variants={line}
-                  custom={i}
-                  initial="hidden"
-                  animate={state}
-                >
-                  {l}
-                </motion.span>
-              </span>
-            ))}
-          </h1>
-
-          <motion.p
-            className="mt-8 max-w-md text-[16px] leading-relaxed text-ink-soft sm:text-base"
-            variants={fade}
-            custom={0.3}
-            initial="hidden"
-            animate={state}
+    <div className={`relative overflow-hidden bg-ink ${className}`}>
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={i}
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.6, ease: 'easeInOut' }}
+        >
+          <motion.div
+            className="h-full w-full"
+            initial={{ scale: 1.15 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: interval / 1000 + 1.6, ease: 'linear' }}
           >
-            A private luxury villa perched in Sri Lanka’s highest tea country — where mornings begin above the clouds
-            and evenings end beside the fire.
-          </motion.p>
-
-          <motion.div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4" variants={fade} custom={0.4} initial="hidden" animate={state}>
-            <Magnetic className="w-full sm:w-auto"><Link to="/book" className="btn-primary w-full">Reserve your stay</Link></Magnetic>
-            <Magnetic className="w-full sm:w-auto"><Link to="/rooms" className="btn-outline w-full">Explore suites</Link></Magnetic>
+            <Img src={slides[i].src} alt={slides[i].alt} className="h-full w-full object-cover" />
           </motion.div>
         </motion.div>
-
-        <div className="relative lg:col-span-6">
-          <motion.div
-            className="arch relative ml-auto aspect-[4/5] w-full max-w-[520px] overflow-hidden lg:h-[68vh] lg:max-w-none lg:aspect-auto"
-            initial={{ clipPath: 'inset(100% 0 0 0)' }}
-            animate={ready ? { clipPath: 'inset(0% 0 0 0)' } : {}}
-            transition={{ duration: 1.6, ease: [0.76, 0, 0.24, 1] }}
-          >
-            <motion.div style={{ y: imgY }} className="absolute -inset-y-24 inset-x-0">
-              <motion.div
-                className="h-full w-full"
-                initial={{ scale: 1.3 }}
-                animate={ready ? { scale: 1 } : {}}
-                transition={{ duration: 2.4, ease }}
-              >
-                <Img src={images.hero} alt="Mist rolling over the mountains near Haputale" className="h-full w-full object-cover" />
-              </motion.div>
-            </motion.div>
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/30 to-transparent" />
-            {ready && <Mist />}
-            {ready && <Birds start={1.8} />}
-          </motion.div>
-
-          {/* overlapping small image */}
-          <motion.div
-            className="absolute -bottom-8 left-0 hidden w-44 overflow-hidden border-[6px] border-white shadow-2xl shadow-ink/10 sm:block lg:-left-10 lg:w-56"
-            variants={fade}
-            custom={0.6}
-            initial="hidden"
-            animate={state}
-          >
-            <Img src={images.tea} alt="Ceylon tea" className="aspect-square h-full w-full object-cover" />
-          </motion.div>
-
-          {/* rotating badge */}
-          <motion.div
-            className="absolute -top-6 right-4 hidden h-32 w-32 sm:block lg:-left-16 lg:right-auto lg:top-24"
-            variants={fade}
-            custom={0.7}
-            initial="hidden"
-            animate={state}
-          >
-            <RotatingBadge />
-          </motion.div>
-        </div>
-      </div>
-
-      <motion.div
-        className="container-luxe relative z-10 pb-12 pt-12 sm:pb-16 sm:pt-20 lg:pb-10 lg:pt-16"
-        variants={fade}
-        custom={0.5}
-        initial="hidden"
-        animate={state}
-      >
-        <BookingBar />
-      </motion.div>
-    </section>
-  )
-}
-
-function RotatingBadge() {
-  return (
-    <div className="relative h-full w-full rounded-full bg-white shadow-xl shadow-ink/5">
-      <motion.svg viewBox="0 0 100 100" className="h-full w-full" animate={{ rotate: 360 }} transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}>
-        <defs>
-          <path id="circle" d="M50 50 m-38 0 a38 38 0 1 1 76 0 a38 38 0 1 1 -76 0" />
-        </defs>
-        <text className="fill-ink font-caps text-[8.4px] tracking-[0.32em]">
-          <textPath href="#circle">LUXURY VILLA • HAPUTALE • SRI LANKA •</textPath>
-        </text>
-      </motion.svg>
-      <ArchMark className="absolute left-1/2 top-1/2 h-12 w-auto -translate-x-1/2 -translate-y-1/2" />
+      </AnimatePresence>
+      <div className={`absolute inset-0 ${overlay}`} />
+      {children?.({ i, setI })}
     </div>
   )
 }
 
-function BookingBar() {
-  const navigate = useNavigate()
-  const today = new Date().toISOString().split('T')[0]
-  const [form, setForm] = useState({ checkin: '', checkout: '', guests: '2' })
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
-  const submit = (e) => {
-    e.preventDefault()
-    navigate(`/book?${new URLSearchParams(form).toString()}`)
+const heroSlides = [
+  { src: images.hero, alt: 'Mist rolling over the mountains near Haputale' },
+  { src: images.villa, alt: 'Villa Cavo' },
+  { src: images.mist, alt: 'Sunrise above the clouds' },
+  { src: images.suite, alt: 'Misty Peak Suite' },
+  { src: images.valley, alt: 'The Haputale valley' },
+]
+
+/** Typewriter: reveals letters one by one with a blinking caret. Untyped letters stay
+ *  in the layout (invisible) so nothing shifts while typing. */
+function TypeLines({ lines, start = true, speed = 55, delay = 400, className = '' }) {
+  const reduce = useReducedMotion()
+  const total = lines.reduce((n, l) => n + l.length, 0)
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!start) return
+    if (reduce) { setCount(total); return }
+    let t
+    const d = setTimeout(() => {
+      t = setInterval(() => setCount((c) => (c >= total ? (clearInterval(t), c) : c + 1)), speed)
+    }, delay)
+    return () => { clearTimeout(d); clearInterval(t) }
+  }, [start, reduce, total, speed, delay])
+
+  let offset = 0
+  return (
+    <>
+      <span className="sr-only">{lines.join(' ')}</span>
+      {lines.map((l) => {
+        const from = offset
+        offset += l.length
+        const typed = Math.max(0, Math.min(l.length, count - from))
+        const caretHere = count < total ? typed < l.length && count >= from : from + l.length === total
+        return (
+          <span key={l} aria-hidden className={`block pb-[0.05em] ${className}`}>
+            {l.slice(0, typed)}
+            {caretHere && <span className="type-caret" />}
+            <span className="invisible">{l.slice(typed)}</span>
+          </span>
+        )
+      })}
+    </>
+  )
+}
+
+function Hero() {
+  const ready = useSplashDone()
+  const state = ready ? 'show' : 'hidden'
+  const fade = {
+    hidden: { opacity: 0, y: 28 },
+    show: (d) => ({ opacity: 1, y: 0, transition: { duration: 1, delay: d, ease } }),
   }
   return (
-    <form
-      onSubmit={submit}
-      className="grid gap-0 border border-ink/10 bg-white/95 shadow-2xl shadow-ink/5 backdrop-blur sm:grid-cols-2 lg:max-w-4xl lg:grid-cols-[1fr_1fr_1fr_auto]"
-    >
-      {[
-        { k: 'checkin', label: 'Check in', type: 'date', min: today },
-        { k: 'checkout', label: 'Check out', type: 'date', min: form.checkin || today },
-      ].map((f) => (
-        <label key={f.k} className="flex flex-col gap-1 border-b border-ink/10 px-6 py-4 sm:border-r lg:border-b-0">
-          <span className="label-luxe">{f.label}</span>
-          <input type={f.type} min={f.min} value={form[f.k]} onChange={set(f.k)} className="border-0 bg-transparent p-0 text-sm text-ink focus:outline-none focus:ring-0" />
-        </label>
-      ))}
-      <label className="flex flex-col gap-1 border-b border-ink/10 px-6 py-4 sm:border-r lg:border-b-0">
-        <span className="label-luxe">Guests</span>
-        <select value={form.guests} onChange={set('guests')} className="border-0 bg-transparent p-0 text-sm text-ink focus:outline-none focus:ring-0">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <option key={n} value={n}>{n} {n === 1 ? 'Guest' : 'Guests'}</option>
-          ))}
-        </select>
-      </label>
-      <button className="btn-primary h-full !py-5">Check availability</button>
-    </form>
+    <section className="relative">
+      <FullSlider
+        slides={heroSlides}
+        active={ready}
+        className="h-[100svh] min-h-[600px]"
+        overlay="bg-gradient-to-b from-ink/55 via-ink/35 to-ink/65"
+      >
+        {({ i, setI }) => (
+          <>
+            {ready && <Mist />}
+            {ready && <Birds start={2} />}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="container-luxe text-center text-white">
+                <motion.p
+                  className="font-caps text-[12px] uppercase tracking-[0.45em] text-white/85 sm:text-[13px]"
+                  variants={fade}
+                  custom={0}
+                  initial="hidden"
+                  animate={state}
+                >
+                  Welcome to Villa Cavo
+                </motion.p>
+                <motion.span
+                  className="mx-auto mt-5 block h-px w-28 origin-center bg-white/60 sm:w-40"
+                  initial={{ scaleX: 0 }}
+                  animate={ready ? { scaleX: 1 } : {}}
+                  transition={{ duration: 1.2, delay: 0.2, ease }}
+                />
+                <h1 className="mt-6 font-display uppercase leading-[1.02] tracking-[0.04em] text-white">
+                  <TypeLines lines={['A luxury villa', 'beneath the', 'misty peaks']} start={ready} className="text-[2rem] sm:text-6xl lg:text-[5.6rem]" />
+                </h1>
+                <motion.p
+                  className="mx-auto mt-7 max-w-xl text-[16px] leading-relaxed text-white/90 sm:text-lg"
+                  variants={fade}
+                  custom={2.3}
+                  initial="hidden"
+                  animate={state}
+                >
+                  Wake above the clouds in Haputale, unwind in private luxury and savour the timeless beauty of
+                  Sri Lanka’s hill country.
+                </motion.p>
+                <motion.div
+                  className="mx-auto mt-10 flex max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4"
+                  variants={fade}
+                  custom={2.5}
+                  initial="hidden"
+                  animate={state}
+                >
+                  <Magnetic className="w-full sm:w-auto">
+                    <a href={`https://wa.me/${contact.whatsapp}?text=${encodeURIComponent('Hello Villa Cavo, I would like to enquire about a stay.')}`} target="_blank" rel="noreferrer" className="btn-primary w-full">
+                      Enquire on WhatsApp
+                    </a>
+                  </Magnetic>
+                  <Magnetic className="w-full sm:w-auto">
+                    <Link to="/contact" className="btn-ghost w-full">
+                      Email us
+                    </Link>
+                  </Magnetic>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* slide indicators */}
+            <motion.div
+              className="absolute inset-x-0 bottom-8 z-10"
+              variants={fade}
+              custom={1.1}
+              initial="hidden"
+              animate={state}
+            >
+              <div className="container-luxe flex items-center justify-between">
+                <span className="hidden font-caps text-[11px] uppercase tracking-[0.35em] text-white/70 sm:block">Haputale · Sri Lanka</span>
+                <div className="mx-auto flex items-center gap-3 sm:mx-0">
+                  {heroSlides.map((sl, k) => (
+                    <button
+                      key={sl.alt}
+                      onClick={() => setI(k)}
+                      aria-label={`Show slide ${k + 1}`}
+                      className={`h-[2px] transition-all duration-700 ${k === i ? 'w-12 bg-white' : 'w-6 bg-white/40 hover:bg-white/70'}`}
+                    />
+                  ))}
+                </div>
+                <span className="hidden font-caps text-[11px] tracking-[0.35em] text-white/70 sm:block">
+                  0{i + 1} / 0{heroSlides.length}
+                </span>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </FullSlider>
+    </section>
   )
 }
 
@@ -228,53 +238,69 @@ function Welcome() {
     { n: 24, s: 'h', label: 'Butler service' },
   ]
   return (
-    <section className="relative overflow-hidden bg-white py-24 sm:py-32">
-      <div className="container-luxe grid items-center gap-16 lg:grid-cols-12">
-        <div className="relative lg:col-span-6">
-          <div className="grid grid-cols-12 gap-4">
-            <CurtainImg src={images.villa} alt="Villa Cavo" className="arch col-span-7 aspect-[3/4]" />
-            <div className="col-span-5 flex flex-col justify-end gap-4 pb-10">
-              <CurtainImg src={images.living} alt="Living lounge" className="aspect-[3/4]" delay={0.2} />
-              <Reveal delay={0.3}>
-                <p className="font-display text-lg italic leading-snug text-terra-500">“A home in the clouds.”</p>
-              </Reveal>
+    <>
+      <section className="relative overflow-hidden bg-cream py-24 sm:py-32">
+        <div className="container-luxe grid items-center gap-16 lg:grid-cols-12 lg:gap-20">
+          {/* photo composition */}
+          <div className="relative pb-16 pr-10 sm:pb-20 sm:pr-16 lg:col-span-6">
+            <CurtainImg src={images.villa2} alt="Villa Cavo terrace" className="aspect-square w-full" />
+            <Reveal delay={0.3} className="absolute bottom-0 right-0 w-[45%] border-[6px] border-cream shadow-2xl sm:border-8">
+              <Img src={images.tea} alt="Ceylon tea" className="aspect-square w-full object-cover" />
+            </Reveal>
+            <Reveal delay={0.45} className="absolute -left-3 top-8 bg-terra-500 px-5 py-4 text-white shadow-xl sm:-left-6 sm:px-7 sm:py-5">
+              <p className="font-caps text-[10px] uppercase tracking-[0.3em] text-white/80">Uva Highlands</p>
+              <p className="mt-1 font-display text-2xl sm:text-3xl">Haputale</p>
+            </Reveal>
+          </div>
+
+          <div className="lg:col-span-6">
+            <SectionHeading
+              eyebrow="Welcome to Villa Cavo"
+              title={['An intimate retreat', 'in the heart of', 'tea country']}
+            />
+            <Reveal delay={0.2}>
+              <p className="mt-8 text-[16px] leading-relaxed text-ink-soft">
+                Set on a quiet ridge above Haputale, Villa Cavo is a private sanctuary where colonial elegance meets the
+                untamed beauty of Sri Lanka’s Uva highlands. Mist-veiled peaks, emerald tea terraces and the gentle rhythm
+                of hill-country life surround you.
+              </p>
+              <p className="mt-4 text-[16px] leading-relaxed text-ink-soft">
+                With only a handful of suites, every stay is personal — attentive hosts, a private chef and spaces
+                designed for slowing down.
+              </p>
+              <div className="mt-10">
+                <ArrowLink to="/about">Discover our story</ArrowLink>
+              </div>
+            </Reveal>
+
+            <div className="mt-12 grid grid-cols-3 divide-x divide-ink/10 border-t border-ink/10 pt-8">
+              {stats.map((s, i) => (
+                <Reveal key={s.label} delay={i * 0.1} className={i === 0 ? 'pr-4' : 'px-4 sm:px-6'}>
+                  <p className="font-display text-4xl text-terra-500 sm:text-5xl">
+                    <Counter to={s.n} suffix={s.s} />
+                  </p>
+                  <p className="mt-2 font-caps text-[10px] uppercase tracking-[0.12em] text-ink-mute sm:tracking-[0.25em]">{s.label}</p>
+                </Reveal>
+              ))}
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="lg:col-span-6 lg:pl-10">
-          <SectionHeading
-            eyebrow="Welcome to Villa Cavo"
-            title={['An intimate retreat', 'in the heart of', 'tea country']}
-          />
-          <Reveal delay={0.2}>
-            <p className="mt-8 text-[16px] leading-relaxed text-ink-soft">
-              Set on a quiet ridge above Haputale, Villa Cavo is a private sanctuary where colonial elegance meets the
-              untamed beauty of Sri Lanka’s Uva highlands. Mist-veiled peaks, emerald tea terraces and the gentle rhythm
-              of hill-country life surround you.
-            </p>
-            <p className="mt-4 text-[16px] leading-relaxed text-ink-soft">
-              With only a handful of suites, every stay is personal — attentive hosts, a private chef and spaces
-              designed for slowing down.
-            </p>
-            <div className="mt-10">
-              <ArrowLink to="/about">Discover our story</ArrowLink>
-            </div>
-          </Reveal>
-
-          <div className="mt-14 grid grid-cols-3 gap-px overflow-hidden border border-ink/10 bg-ink/10">
-            {stats.map((s, i) => (
-              <Reveal key={s.label} delay={i * 0.1} className="bg-white p-4 sm:p-5">
-                <p className="font-display text-3xl text-terra-500 sm:text-4xl">
-                  <Counter to={s.n} suffix={s.s} />
-                </p>
-                <p className="mt-2 font-caps text-[10px] tracking-[0.12em] text-ink-mute sm:tracking-[0.25em]">{s.label}</p>
-              </Reveal>
-            ))}
+      {/* full-screen photo */}
+      <section className="relative">
+        <ParallaxImg src={images.villa} alt="Villa Cavo" className="h-[100svh] min-h-[520px]" strength={120} />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent" />
+        <div className="absolute inset-x-0 bottom-10 sm:bottom-16">
+          <div className="container-luxe text-white">
+            <Reveal>
+              <p className="font-caps text-[12px] uppercase tracking-[0.35em] text-white/80">Villa Cavo · Haputale</p>
+              <p className="mt-3 max-w-2xl font-display text-3xl leading-tight sm:text-5xl">A home in the clouds.</p>
+            </Reveal>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 
@@ -293,13 +319,13 @@ function useIsDesktop() {
 function RoomCard({ room, i }) {
   return (
     <Link to="/rooms" data-cursor="View" className="group block w-[82vw] shrink-0 sm:w-[60vw] lg:w-[34vw] xl:w-[30vw]">
-      <Tilt className="arch overflow-hidden">
-      <div className="arch relative aspect-[3/4] overflow-hidden">
+      <Tilt className="overflow-hidden">
+      <div className="relative aspect-square overflow-hidden">
         <Img src={room.image} alt={room.name} className="h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-110" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-        <span className="absolute left-6 top-24 font-caps text-[11px] tracking-[0.3em] text-white/80">0{i + 1}</span>
+        <span className="absolute left-6 top-6 font-caps text-[11px] tracking-[0.3em] text-white/80">0{i + 1}</span>
         <div className="absolute inset-x-6 bottom-6 text-white">
-          <p className="font-caps text-[11px] tracking-[0.3em] text-terra-100">{room.price} / night</p>
+          <p className="font-caps text-[11px] uppercase tracking-[0.3em] text-terra-100">{room.view}</p>
           <h3 className="mt-2 text-3xl sm:text-4xl">{room.name}</h3>
           <div className="mt-4 flex max-h-0 items-center gap-4 overflow-hidden text-xs text-white/80 opacity-0 transition-all duration-700 group-hover:max-h-10 group-hover:opacity-100">
             <span>{room.size}</span>·<span>{room.guests}</span>·<span>{room.view}</span>
@@ -547,10 +573,10 @@ function ExperienceList() {
                 to="/experiences"
                 data-cursor="Explore"
                 onMouseEnter={() => setActive(i)}
-                className="group relative z-10 grid grid-cols-12 items-center gap-4 border-b border-ink/10 py-7 sm:py-9"
+                className="group relative z-10 grid grid-cols-12 items-center gap-4 border-b border-ink/10 py-5 sm:py-7"
               >
                 <span className="col-span-2 font-caps text-xs text-terra-500 sm:col-span-1">0{i + 1}</span>
-                <h3 className="col-span-10 text-2xl text-ink transition-all duration-500 group-hover:translate-x-3 group-hover:italic group-hover:text-terra-500 sm:col-span-7 sm:text-4xl lg:text-5xl">
+                <h3 className="col-span-10 text-ink transition-all duration-500 group-hover:translate-x-3 group-hover:italic group-hover:text-terra-500 sm:col-span-7 text-xl sm:text-2xl lg:text-3xl">
                   {e.title}
                 </h3>
                 <span className="col-span-6 col-start-3 font-caps text-[11px] tracking-[0.3em] text-ink-mute sm:col-span-2 sm:col-start-auto">
@@ -583,7 +609,36 @@ function ExperienceList() {
           </motion.div>
         </div>
       </div>
+
+      <PhotoMarquee
+        className="mt-16"
+        to="/experiences"
+        items={experiences.map((e) => ({ src: e.image, label: e.title }))}
+      />
     </section>
+  )
+}
+
+/* ---------------------------------------------------------- PHOTO MARQUEE (left → right) */
+function PhotoMarquee({ items, to, fade = 'from-white', className = '' }) {
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      <div className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r ${fade} to-transparent sm:w-32`} />
+      <div className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l ${fade} to-transparent sm:w-32`} />
+      <div className="animate-marquee-right flex w-max gap-6 py-10 sm:gap-10">
+        {[...items, ...items].map((p, i) => (
+          <Link
+            key={i}
+            to={to}
+            aria-hidden={i >= items.length}
+            tabIndex={i >= items.length ? -1 : undefined}
+            className="arch group block h-72 w-56 shrink-0 overflow-hidden shadow-2xl sm:h-96 sm:w-72"
+          >
+            <Img src={p.src} alt={p.label} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          </Link>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -608,9 +663,6 @@ function DayTimeline() {
             title={['From mist', 'to starlight']}
             text="Every day in the highlands unfolds at its own gentle pace. Here is how a perfect one might look."
           />
-          <Reveal delay={0.3}>
-            <CurtainImg src={images.coffee} alt="Morning coffee on the terrace" className="mt-10 hidden aspect-[4/3] lg:block" />
-          </Reveal>
         </div>
 
         <div ref={ref} className="relative lg:col-span-6 lg:col-start-7">
@@ -638,32 +690,29 @@ function DayTimeline() {
 /* ---------------------------------------------------------------- DINING */
 function DiningTeaser() {
   return (
-    <section className="relative overflow-hidden bg-white py-24 sm:py-32">
-      <div className="container-luxe grid items-center gap-16 lg:grid-cols-12">
-        <div className="order-2 lg:order-1 lg:col-span-5">
+    <section className="relative min-h-[100svh] overflow-hidden">
+      <ParallaxImg src={images.dining} alt="Dining at Villa Cavo" className="!absolute inset-0 h-full" strength={100} />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/55 to-ink/20" />
+      <div className="container-luxe relative flex min-h-[100svh] items-center py-24">
+        <div className="max-w-xl text-white">
           <SectionHeading
+            light
             eyebrow="Dining"
             title={['Flavours of', 'the highlands']}
             text="Our chef blends heirloom Sri Lankan recipes with produce from local farms and our own kitchen garden. Breakfast on the lawn, high tea at four, candlelit dinners by the fire."
           />
           <Reveal delay={0.3}>
-            <ul className="mt-10 space-y-4 border-t border-ink/10 pt-8">
+            <ul className="mt-10 space-y-4 border-t border-white/20 pt-8">
               {['Traditional Sri Lankan rice & curry', 'Colonial high tea service', 'Private candlelit dinners', 'Garden-to-table breakfasts'].map((t) => (
-                <li key={t} className="flex items-center gap-4 text-[16px] text-ink-soft">
-                  <Icon name="leaf" className="h-4 w-4 text-terra-500" />
+                <li key={t} className="flex items-center gap-4 text-[16px] text-white/90">
+                  <Icon name="leaf" className="h-4 w-4 text-terra-200" />
                   {t}
                 </li>
               ))}
             </ul>
             <div className="mt-10">
-              <ArrowLink to="/dining">Explore dining</ArrowLink>
+              <ArrowLink to="/dining" light>Explore dining</ArrowLink>
             </div>
-          </Reveal>
-        </div>
-        <div className="relative order-1 lg:order-2 lg:col-span-7">
-          <ParallaxImg src={images.dining} alt="Dining at Villa Cavo" className="aspect-[4/3] w-full lg:w-[85%] lg:ml-auto" strength={60} />
-          <Reveal delay={0.3} className="absolute -bottom-10 left-0 w-2/5 border-[6px] border-white shadow-2xl shadow-ink/10">
-            <Img src={images.food} alt="Chef's plate" className="aspect-square w-full object-cover" />
           </Reveal>
         </div>
       </div>
@@ -771,12 +820,12 @@ function Testimonials() {
 /* -------------------------------------------------------------- LOCATION */
 function Location() {
   return (
-    <section className="relative overflow-hidden bg-white py-24 sm:py-32">
-      <div className="container-luxe grid gap-16 lg:grid-cols-12">
-        <div className="lg:col-span-5">
-          <CurtainImg src={images.landscape} alt="Haputale landscape" className="arch aspect-[4/5]" />
-        </div>
-        <div className="lg:col-span-6 lg:col-start-7">
+    <section className="relative overflow-hidden bg-white lg:grid lg:min-h-screen lg:grid-cols-2">
+      <div className="relative h-[100svh] min-h-[480px] lg:h-auto">
+        <ParallaxImg src={images.landscape} alt="Haputale landscape" className="!absolute inset-0 h-full" strength={80} />
+      </div>
+      <div className="flex items-center px-5 py-24 sm:px-8 lg:px-16 lg:py-28 xl:px-24">
+        <div className="w-full max-w-xl">
           <SectionHeading
             eyebrow="The Location"
             title={['Haputale —', 'the edge of the hills']}
@@ -785,12 +834,12 @@ function Location() {
           <ul className="mt-12 border-t border-ink/10">
             {attractions.map((a, i) => (
               <Reveal key={a.name} delay={i * 0.05}>
-                <li className="group flex items-center justify-between border-b border-ink/10 py-5">
+                <li className="group flex items-center justify-between gap-4 border-b border-ink/10 py-5">
                   <span className="flex items-center gap-4 text-[16px] text-ink transition-transform duration-500 group-hover:translate-x-2">
-                    <Icon name="mountain" className="h-4 w-4 text-terra-500" />
+                    <Icon name="mountain" className="h-4 w-4 shrink-0 text-terra-500" />
                     {a.name}
                   </span>
-                  <span className="font-caps text-[11px] tracking-[0.25em] text-ink-mute">{a.distance}</span>
+                  <span className="shrink-0 font-caps text-[11px] uppercase tracking-[0.2em] text-ink-mute">{a.distance}</span>
                 </li>
               </Reveal>
             ))}
@@ -806,30 +855,35 @@ function Location() {
 
 /* ---------------------------------------------------------- GALLERY STRIP */
 function GalleryStrip() {
-  const pics = gallery.slice(0, 6)
+  const ref = useRef(null)
+  const inView = useInView(ref, { amount: 0.3 })
+  const pics = gallery.slice(1, 9).map((g) => ({ src: g.src, alt: g.alt }))
   return (
-    <section className="bg-cream py-24">
-      <div className="container-luxe text-center">
-        <Reveal>
-          <Eyebrow center>Moments</Eyebrow>
-          <h2 className="mt-5 text-4xl text-ink sm:text-5xl">
-            Life at <span className="italic text-terra-500">Villa Cavo</span>
-          </h2>
-        </Reveal>
-        <Ornament className="mt-8" />
-      </div>
-      <div className="mt-14 grid grid-cols-2 gap-3 px-3 sm:grid-cols-3 lg:grid-cols-6">
-        {pics.map((p, i) => (
-          <Reveal key={p.alt} delay={i * 0.07} y={i % 2 ? 60 : 20}>
-            <Link to="/gallery" data-cursor="View" className={`group block overflow-hidden ${i % 2 ? 'arch' : ''}`}>
-              <Img src={p.src} alt={p.alt} className="aspect-[3/4] w-full object-cover transition-transform duration-[1.4s] group-hover:scale-110" />
-            </Link>
-          </Reveal>
-        ))}
-      </div>
-      <div className="mt-12 text-center">
-        <ArrowLink to="/gallery">View the gallery</ArrowLink>
-      </div>
+    <section ref={ref} className="relative">
+      <FullSlider slides={pics} active={inView} interval={4500} className="h-[100svh] min-h-[560px]" overlay="bg-gradient-to-b from-ink/50 via-ink/20 to-ink/60">
+        {({ i, setI }) => (
+          <div className="absolute inset-0 flex flex-col items-center justify-between py-20 text-center text-white">
+            <Reveal>
+              <p className="font-caps text-[12px] uppercase tracking-[0.4em] text-white/80">Moments</p>
+              <h2 className="mt-5 text-4xl uppercase tracking-[0.04em] sm:text-6xl">Life at Villa Cavo</h2>
+            </Reveal>
+            <div className="flex flex-col items-center gap-8">
+              <p className="font-caps text-[12px] uppercase tracking-[0.3em] text-white/80">{pics[i].alt}</p>
+              <div className="flex items-center gap-3">
+                {pics.map((p, k) => (
+                  <button
+                    key={p.alt}
+                    onClick={() => setI(k)}
+                    aria-label={`Show ${p.alt}`}
+                    className={`h-[2px] transition-all duration-700 ${k === i ? 'w-10 bg-white' : 'w-5 bg-white/40 hover:bg-white/70'}`}
+                  />
+                ))}
+              </div>
+              <ArrowLink to="/gallery" light>View the gallery</ArrowLink>
+            </div>
+          </div>
+        )}
+      </FullSlider>
     </section>
   )
 }

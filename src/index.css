@@ -13,6 +13,15 @@
   h1, h2, h3, h4 {
     @apply font-display font-normal;
   }
+  /* the label font was a capitals-only face before; keep those labels in capitals */
+  .font-caps, .eyebrow, .label-luxe, .btn {
+    text-transform: uppercase;
+  }
+  /* Gilda Display has no true italic: keep accent words upright, coloured only */
+  h1 .italic, h2 .italic, h3 .italic, h1.italic, h2.italic, h3.italic,
+  .font-display.italic, .font-display .italic, blockquote.italic {
+    font-style: normal;
+  }
 }
 
 @layer components {
@@ -82,6 +91,40 @@
   to { transform: translateX(-50%); }
 }
 
+/* slides left → right, seamless when content is duplicated */
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.animate-marquee-right {
+  animation: marquee-right 40s linear infinite;
+}
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
+/* typewriter caret */
+.type-caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 0.85em;
+  vertical-align: -0.05em;
+}
+.type-caret::after {
+  content: '';
+  position: absolute;
+  left: 0.02em;
+  top: 0;
+  width: 0.06em;
+  height: 100%;
+  background: currentColor;
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
 @keyframes drift {
   0%, 100% { transform: translateX(-4%); }
   50% { transform: translateX(4%); }
@@ -91,5 +134,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee, .animate-drift, .shimmer-text { animation: none; }
+  .animate-marquee, .animate-marquee-right, .animate-drift, .shimmer-text { animation: none; }
 }

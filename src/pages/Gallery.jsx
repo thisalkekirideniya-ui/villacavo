@@ -49,7 +49,7 @@ export default function Gallery() {
             ))}
           </div>
 
-          <motion.div layout className="mt-14 columns-1 gap-4 sm:columns-2 lg:columns-3">
+          <motion.div layout className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
               {list.map((g, i) => (
                 <motion.button
@@ -61,12 +61,12 @@ export default function Gallery() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.6, delay: (i % 6) * 0.05, ease }}
-                  className={`group relative mb-4 block w-full overflow-hidden break-inside-avoid ${i % 5 === 0 ? 'arch' : ''}`}
+                  className="group relative block w-full overflow-hidden"
                 >
                   <Img
                     src={g.src}
                     alt={g.alt}
-                    className={`w-full object-cover transition-transform duration-[1.4s] group-hover:scale-110 ${['aspect-[3/4]', 'aspect-square', 'aspect-[4/5]', 'aspect-[4/3]'][i % 4]}`}
+                    className="aspect-square w-full object-cover transition-transform duration-[1.4s] group-hover:scale-110"
                   />
                   <div className="absolute inset-0 flex items-end bg-gradient-to-t from-ink/60 via-transparent to-transparent p-5 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
                     <div className="text-left text-white">

@@ -123,7 +123,7 @@ export default function Dining() {
         </div>
       </section>
 
-      <CtaBand image={images.dining} title={['Reserve a', 'private dinner']} />
+      <CtaBand image={images.dining} title={['Plan a', 'private dinner']} />
     </>
   )
 }

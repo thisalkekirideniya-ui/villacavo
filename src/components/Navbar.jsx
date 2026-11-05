@@ -112,7 +112,7 @@ function MobileMenu({ onClose }) {
             to="/book"
             className="btn w-full bg-white text-terra-700 hover:bg-terra-100"
           >
-            Reserve your stay
+            Make an enquiry
           </Link>
           <div className="mt-6 flex items-end justify-between gap-4">
             <div className="space-y-1 text-sm text-white/75">
@@ -160,6 +160,9 @@ export default function Navbar() {
     lockScroll(open)
   }, [open])
 
+  // over the full-screen photo hero on the home page the bar starts out light
+  const light = pathname === '/' && !scrolled
+
   return (
     <>
       <header
@@ -168,7 +171,7 @@ export default function Navbar() {
         }`}
       >
         <div className="container-luxe flex items-center justify-between">
-          <Logo />
+          <Logo light={light} />
 
           <nav className="hidden items-center gap-8 xl:flex" aria-label="Main">
             {navLinks.slice(1).map((l) => (
@@ -177,7 +180,7 @@ export default function Navbar() {
                 to={l.to}
                 className={({ isActive }) =>
                   `link-underline font-caps text-[12px] uppercase tracking-[0.25em] transition-colors ${
-                    isActive ? 'text-terra-500' : 'text-ink hover:text-terra-500'
+                    isActive ? (light ? 'text-white' : 'text-terra-500') : light ? 'text-white/85 hover:text-white' : 'text-ink hover:text-terra-500'
                   }`
                 }
               >
@@ -188,16 +191,16 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4">
             <Link to="/book" className="btn-primary hidden !px-6 !py-3 sm:inline-flex">
-              Reserve
+              Enquire
             </Link>
             <button
               onClick={() => setOpen(true)}
               className="group flex h-11 w-11 flex-col items-center justify-center gap-[6px] xl:hidden"
               aria-label="Open menu"
             >
-              <span className="h-px w-7 bg-ink transition-all group-hover:w-5" />
-              <span className="h-px w-7 bg-ink" />
-              <span className="h-px w-7 bg-ink transition-all group-hover:w-5" />
+              <span className={`h-px w-7 transition-all group-hover:w-5 ${light ? 'bg-white' : 'bg-ink'}`} />
+              <span className={`h-px w-7 ${light ? 'bg-white' : 'bg-ink'}`} />
+              <span className={`h-px w-7 transition-all group-hover:w-5 ${light ? 'bg-white' : 'bg-ink'}`} />
             </button>
           </div>
         </div>

@@ -74,7 +74,6 @@ export const rooms = [
     guests: '2 Adults',
     bed: 'King Bed',
     view: 'Panoramic Mountain View',
-    price: 'From USD 280',
     description:
       'Wake above the clouds. Floor-to-ceiling glass opens onto a private terrace where the morning mist drifts through the valley below. A deep soaking tub, a reading nook by the fireplace and hand-loomed linens complete the most coveted room at Villa Cavo.',
     features: ['Private terrace', 'Fireplace', 'Soaking tub', 'Rain shower', 'Butler service', 'Minibar'],
@@ -89,7 +88,6 @@ export const rooms = [
     guests: '2 Adults',
     bed: 'King or Twin',
     view: 'Tea Estate View',
-    price: 'From USD 210',
     description:
       'Step from your room straight into the garden. Warm timber, colonial-era detailing and a private veranda overlooking the tea estates make the Deluxe rooms a serene retreat — perfect for slow mornings with a pot of freshly brewed Uva tea.',
     features: ['Garden veranda', 'Writing desk', 'Walk-in shower', 'Tea & coffee bar', 'Smart TV', 'Wi-Fi'],
@@ -104,7 +102,6 @@ export const rooms = [
     guests: '4 Adults + 2 Children',
     bed: '1 King + 2 Twin',
     view: 'Valley & Garden View',
-    price: 'From USD 390',
     description:
       'A home among the hills for families and friends. Two bedrooms share a living lounge with a fireplace and dining table, opening onto a wide deck where evenings are spent watching the lights of the valley flicker on.',
     features: ['Two bedrooms', 'Living lounge', 'Fireplace', 'Large deck', 'Kids amenities', 'In-villa dining'],
@@ -119,7 +116,6 @@ export const rooms = [
     guests: '2 Adults',
     bed: 'King Bed',
     view: 'Forest & Sky View',
-    price: 'From USD 240',
     description:
       'Tucked beneath vaulted timber beams, the Cloud Loft is an intimate escape with a skylight above the bed — for stargazing on clear nights and watching the clouds roll in by day. Ideal for honeymooners.',
     features: ['Skylight', 'Vaulted ceiling', 'Freestanding tub', 'Honeymoon setup', 'Bluetooth speaker', 'Wi-Fi'],

@@ -24,7 +24,7 @@ export default function About() {
         eyebrow="Our Story"
         title={['A home', 'among the clouds']}
         text="Villa Cavo was born from a love of the hill country — its silence, its seasons and its people. This is our story."
-        image={images.villa}
+        images={[images.villa, images.cabin]}
       />
 
       {/* Intro */}
@@ -44,9 +44,8 @@ export default function About() {
               <p className="mt-8 font-display text-3xl italic text-terra-500">— The Villa Cavo Family</p>
             </Reveal>
           </div>
-          <div className="grid grid-cols-2 gap-4 lg:col-span-6">
-            <CurtainImg src={images.villa2} alt="Villa exterior" className="arch aspect-[3/4]" />
-            <CurtainImg src={images.cabin} alt="Highland surroundings" className="mt-16 aspect-[3/4]" delay={0.2} />
+          <div className="lg:col-span-6">
+            <CurtainImg src={images.villa2} alt="Villa exterior" className="aspect-square w-full" />
           </div>
         </div>
       </section>

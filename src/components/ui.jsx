@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import ArchMark from './ArchMark'
 import { Leaf } from './Splash'
 import { Birds, Magnetic, Mist } from './magic'
+import { contact } from '../data/site'
 
 export const ease = [0.22, 1, 0.36, 1]
 
@@ -152,7 +153,7 @@ export function Ornament({ className = '', light = false }) {
 }
 
 /** Inner-page hero: arch image + big serif title on white */
-export function PageHero({ eyebrow, title, text, image }) {
+export function PageHero({ eyebrow, title, text, image, images: pair, square = false }) {
   return (
     <section className="relative overflow-hidden bg-white pt-32 sm:pt-40">
       <div
@@ -164,11 +165,11 @@ export function PageHero({ eyebrow, title, text, image }) {
         }}
       />
       <div className="container-luxe grid items-end gap-10 pb-16 lg:grid-cols-12 lg:pb-24">
-        <div className="lg:col-span-7">
+        <div className={pair ? 'lg:col-span-5' : 'lg:col-span-7'}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
             <Eyebrow>{eyebrow}</Eyebrow>
           </motion.div>
-          <h1 className="mt-6 text-5xl leading-[0.95] text-ink sm:text-7xl lg:text-8xl">
+          <h1 className={`mt-6 text-5xl leading-[0.95] text-ink sm:text-7xl ${pair ? 'lg:text-6xl xl:text-7xl' : 'lg:text-8xl'}`}>
             {(Array.isArray(title) ? title : [title]).map((l, i) => (
               <span key={i} className="block overflow-hidden pb-[0.08em]">
                 <motion.span
@@ -196,23 +197,40 @@ export function PageHero({ eyebrow, title, text, image }) {
 
         {/* Arch image sweeps in from the right edge */}
         <motion.div
-          className="lg:col-span-5"
+          className={pair ? 'lg:col-span-7' : 'lg:col-span-5'}
           initial={{ opacity: 0, x: 260, rotate: 4 }}
           animate={{ opacity: 1, x: 0, rotate: 0 }}
           transition={{ duration: 1.4, delay: 0.25, ease }}
         >
-          <div className="arch relative mx-auto aspect-[4/5] max-w-sm overflow-hidden shadow-[0_30px_60px_-25px_rgba(63,25,11,0.45)] lg:ml-auto lg:mr-0">
-            <motion.div
-              className="h-full w-full"
-              initial={{ clipPath: 'inset(0 0 0 100%)', scale: 1.25, x: 60 }}
-              animate={{ clipPath: 'inset(0 0 0 0%)', scale: 1, x: 0 }}
-              transition={{ duration: 1.6, delay: 0.35, ease }}
-            >
-              <Img src={image} alt="" className="h-full w-full object-cover" />
-            </motion.div>
-            <Mist />
-            <Birds count={3} start={1.8} every={9} />
-          </div>
+          {pair ? (
+            <div className="grid grid-cols-2 gap-3 sm:gap-5">
+              {pair.map((src, i) => (
+                <div key={src} className="relative aspect-square overflow-hidden shadow-[0_30px_60px_-25px_rgba(63,25,11,0.45)]">
+                  <motion.div
+                    className="h-full w-full"
+                    initial={{ clipPath: 'inset(0 0 0 100%)', scale: 1.25, x: 60 }}
+                    animate={{ clipPath: 'inset(0 0 0 0%)', scale: 1, x: 0 }}
+                    transition={{ duration: 1.6, delay: 0.35 + i * 0.2, ease }}
+                  >
+                    <Img src={src} alt="" className="h-full w-full object-cover" />
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={`${square ? 'aspect-square' : 'arch aspect-[4/5]'} relative mx-auto max-w-sm overflow-hidden shadow-[0_30px_60px_-25px_rgba(63,25,11,0.45)] lg:ml-auto lg:mr-0`}>
+              <motion.div
+                className="h-full w-full"
+                initial={{ clipPath: 'inset(0 0 0 100%)', scale: 1.25, x: 60 }}
+                animate={{ clipPath: 'inset(0 0 0 0%)', scale: 1, x: 0 }}
+                transition={{ duration: 1.6, delay: 0.35, ease }}
+              >
+                <Img src={image} alt="" className="h-full w-full object-cover" />
+              </motion.div>
+              <Mist />
+              <Birds count={3} start={1.8} every={9} />
+            </div>
+          )}
         </motion.div>
       </div>
     </section>
@@ -230,16 +248,16 @@ export function CtaBand({ image, title = ['Your escape', 'above the clouds'], te
       <div className="absolute inset-0 flex items-center">
         <div className="container-luxe text-center text-white">
           <Reveal>
-            <p className="font-caps text-[12px] tracking-luxe text-terra-100">Reservations</p>
+            <p className="font-caps text-[12px] tracking-luxe text-terra-100">Enquiries</p>
           </Reveal>
           <MaskText lines={title} className="mt-6 text-5xl italic leading-[1] sm:text-7xl lg:text-8xl" />
           <Reveal delay={0.3}>
             <p className="mx-auto mt-6 max-w-md text-white/85">
-              {text || 'Limited suites, limitless views. Reserve directly with us for the best rates and personalised service.'}
+              {text || 'Limited suites, limitless views. Send us an enquiry by WhatsApp or email and our hosts will reply personally.'}
             </p>
             <div className="mx-auto mt-10 flex max-w-xs flex-col gap-4 sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center">
-              <Magnetic className="w-full sm:w-auto"><Link to="/book" className="btn-primary w-full">Book your stay</Link></Magnetic>
-              <Magnetic className="w-full sm:w-auto"><Link to="/contact" className="btn-ghost w-full">Enquire</Link></Magnetic>
+              <Magnetic className="w-full sm:w-auto"><Link to="/book" className="btn-primary w-full">Make an enquiry</Link></Magnetic>
+              <Magnetic className="w-full sm:w-auto"><a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noreferrer" className="btn-ghost w-full">WhatsApp us</a></Magnetic>
             </div>
           </Reveal>
         </div>

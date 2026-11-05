@@ -26,9 +26,9 @@ export default {
         sand: '#F2EBE3',
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        caps: ['Cinzel', '"Cormorant Garamond"', 'serif'],
-        sans: ['Jost', 'system-ui', 'sans-serif'],
+        display: ['"Gilda Display"', 'Georgia', 'serif'],
+        caps: ['Montserrat', 'system-ui', 'sans-serif'],
+        sans: ['Montserrat', 'system-ui', 'sans-serif'],
       },
       // Slightly larger type scale across the whole site
       fontSize: {
