@@ -25,22 +25,23 @@ export function Reveal({ children, delay = 0, y = 40, x = 0, className = '' }) {
 
 /** Heading text that slides up line by line out of a mask */
 export function MaskText({ lines, className = '', delay = 0, as: Tag = 'h2' }) {
+  // The in-view trigger sits on the heading itself: each line starts fully clipped,
+  // and a line that wraps onto two rows would otherwise never count as "in view".
+  const MotionTag = motion[Tag] || motion.h2
   return (
-    <Tag className={className}>
+    <MotionTag className={className} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }}>
       {lines.map((line, i) => (
         <span key={i} className="block overflow-hidden pb-[0.08em]">
           <motion.span
             className="block"
-            initial={{ y: '105%' }}
-            whileInView={{ y: 0 }}
-            viewport={{ once: true }}
+            variants={{ hidden: { y: '105%' }, show: { y: 0 } }}
             transition={{ duration: 1.1, delay: delay + i * 0.12, ease }}
           >
             {line}
           </motion.span>
         </span>
       ))}
-    </Tag>
+    </MotionTag>
   )
 }
 

@@ -535,7 +535,7 @@ function MistQuote() {
           </Reveal>
           <MaskText
             lines={['“Here, the mountains', 'breathe slowly — and', 'so do you.”']}
-            className="mt-8 font-display text-4xl italic leading-[1.1] sm:text-6xl lg:text-7xl"
+            className="mt-8 font-display text-[1.85rem] italic leading-[1.15] sm:text-6xl lg:text-7xl"
           />
           <Reveal delay={0.4}>
             <p className="mt-8 font-caps text-[12px] tracking-luxe text-white/80">The Haputale Gap · Uva Province</p>
