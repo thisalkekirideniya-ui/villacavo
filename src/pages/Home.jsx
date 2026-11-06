@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AnimatePresence, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, animate } from 'framer-motion'
+import { AnimatePresence, motion, useInView, useMotionValue, useScroll, useSpring, useTransform, animate } from 'framer-motion'
 import { useSplashDone } from '../context'
 import {
   Reveal, MaskText, Img, ParallaxImg, CurtainImg, Eyebrow, SectionHeading, Ornament, CtaBand, ArrowLink, ease,
@@ -75,20 +75,19 @@ const heroSlides = [
 
 /** Typewriter: reveals letters one by one with a blinking caret. Untyped letters stay
  *  in the layout (invisible) so nothing shifts while typing. */
-function TypeLines({ lines, start = true, speed = 55, delay = 400, className = '' }) {
-  const reduce = useReducedMotion()
+function TypeLines({ lines, start = true, speed = 55, delay = 1200, className = '' }) {
   const total = lines.reduce((n, l) => n + l.length, 0)
   const [count, setCount] = useState(0)
 
+  // delay lets the splash screen finish sliding away before typing begins
   useEffect(() => {
     if (!start) return
-    if (reduce) { setCount(total); return }
     let t
     const d = setTimeout(() => {
       t = setInterval(() => setCount((c) => (c >= total ? (clearInterval(t), c) : c + 1)), speed)
     }, delay)
     return () => { clearTimeout(d); clearInterval(t) }
-  }, [start, reduce, total, speed, delay])
+  }, [start, total, speed, delay])
 
   let offset = 0
   return (
@@ -153,7 +152,7 @@ function Hero() {
                 <motion.p
                   className="mx-auto mt-7 max-w-xl text-[16px] leading-relaxed text-white/90 sm:text-lg"
                   variants={fade}
-                  custom={2.3}
+                  custom={3}
                   initial="hidden"
                   animate={state}
                 >
@@ -163,7 +162,7 @@ function Hero() {
                 <motion.div
                   className="mx-auto mt-10 flex max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4"
                   variants={fade}
-                  custom={2.5}
+                  custom={3.2}
                   initial="hidden"
                   animate={state}
                 >
