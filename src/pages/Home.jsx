@@ -236,6 +236,7 @@ function Welcome() {
     { n: 180, s: '°', label: 'Mountain views' },
     { n: 24, s: 'h', label: 'Butler service' },
   ]
+  const isDesktop = useIsDesktop()
   return (
     <>
       <section className="relative overflow-hidden bg-cream py-24 sm:py-32">
@@ -288,7 +289,12 @@ function Welcome() {
 
       {/* full-screen photo */}
       <section className="relative">
-        <ParallaxImg src={images.villa} alt="Villa Cavo" className="h-[100svh] min-h-[520px]" strength={120} />
+        <ParallaxImg
+          src={images.villa}
+          alt="Villa Cavo"
+          className="h-[62svh] min-h-[420px] sm:h-[100svh] sm:min-h-[520px]"
+          strength={isDesktop ? 120 : 40}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent" />
         <div className="absolute inset-x-0 bottom-10 sm:bottom-16">
           <div className="container-luxe text-white">
