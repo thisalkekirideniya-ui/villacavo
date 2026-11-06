@@ -134,5 +134,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee, .animate-marquee-right, .animate-drift, .shimmer-text { animation: none; }
+  .animate-marquee, .animate-drift, .shimmer-text { animation: none; }
 }
